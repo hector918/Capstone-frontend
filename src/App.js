@@ -5,7 +5,7 @@ import About from "./pages/About";
 import Navigation from "./components/Navigation";
 import ReadingAssistance from "./pages/ReadingAssistance";
 
-import srv from './fetch_';
+// import srv from './fetch_';
 
   srv.read_text_to_image("a bottole of water", (question, data) => {
 
@@ -16,6 +16,22 @@ import srv from './fetch_';
      //JSON.parse is used to retrieve the data object from local storage to access.
      const storage_object = JSON.parse(localStorage.getItem("hash"))
      console.log(storage_object)
+  })
+
+
+  srv.read_text_to_explanation((question, data) => {
+
+    //retrieve existing hash table or empty {}
+    const storedData = JSON.parse(localStorage.getItem("hash")) || {};
+
+    //assign a new key/pair to the object
+   
+        Object.assign(storedData, {asked: question}, {textR:data})
+
+    //store the updated object back to local storage
+    localStorage.setItem("hash",JSON.stringify(storedData));
+   console.log(storedData)
+    
   })
 
 

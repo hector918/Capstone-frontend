@@ -14,8 +14,8 @@ import srv from './fetch_';
     localStorage.setItem("hash", JSON.stringify({question:question, result: data }));
 
      //JSON.parse is used to retrieve the data object from local storage to access.
-    const storage_object = JSON.parse(localStorage.getItem("hash"))
-    console.log(storage_object)
+     const storage_object = JSON.parse(localStorage.getItem("hash"))
+     console.log(storage_object)
   })
 
 

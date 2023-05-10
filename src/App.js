@@ -3,19 +3,20 @@ import Home from "./pages/Home";
 import NavBar from "./components/NavBar";
 import About from "./pages/About";
 import Navigation from "./components/Navigation";
+import ReadingAssistance from "./pages/ReadingAssistance";
 
 import srv from './fetch_';
 
+  srv.read_text_to_image("a bottole of water", (question, data) => {
 
-srv.read_text_to_image("a bottle of water", (question, data)=>{
-  localStorage.setItem("hash",{question: question, result: data });
-});
-()=>{
-  localStorage.getItem("hash");//{question: question, result: data }
-}
+  //set key of "hash" to local storage
+  //stringigy the second argument to store the data object as string into local storage.
+    localStorage.setItem("hash", JSON.stringify({question:question, result: data }));
 
-
-import ReadingAssistance from "./pages/ReadingAssistance";
+     //JSON.parse is used to retrieve the data object from local storage to access.
+    const storage_object = JSON.parse(localStorage.getItem("hash"))
+    console.log(storage_object)
+  })
 
 
 export default function App() {

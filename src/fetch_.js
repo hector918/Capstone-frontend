@@ -14,7 +14,7 @@ function error_handle(error) {
 //upload_file
 //
 
-function question_to_reading_comprehension(q, fileHash){
+function question_to_reading_comprehension(q, fileHash, callback){
   const body  = {
     method: "POST",
     body: new URLSearchParams({q, fileHash}),

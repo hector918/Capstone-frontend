@@ -4,46 +4,14 @@ import NavBar from "./components/NavBar";
 import About from "./pages/About";
 import Navigation from "./components/Navigation";
 
-import srv from './fetch_';
+import RecentsContainer from "./components/RecentsContainer";
 
-
-// const upload_ = (metadata)=>{
-//   let books = localStorage.getItem("books");
-//   books = books.push(metadata);
-//   localStorage.setItem("books", books);
-// }
-
-// ()=>{
-//   localStorage.setItem("books",[
-//     {bookID: "book-{filehash}"},
-//     {bookID: "book-{filehash}"}
-//   ]);
-// }
-
-// ()=>{
-//   const books = localStorage.getItem("books");
-//   const book = localStorage.getItem(`book-${books[0].bookID}`);
-
-// }
-
-// srv.read_text_to_image("a bottle of water", (question, data)=>{
-
-//   localStorage.setItem("book-{filehash}",{
-//     image_histroy:[
-//       {question: question, result: data }
-//     ],
-//     text_histroy:[
-
-//     ],
-//   });
-
-// });
-// ()=>{
-//   localStorage.getItem("book-{filehash}");//{question: question, result: data }
-// }
-
-
+import AllInOneFramework from "./pages/all-in-one-framework";
 import ReadingAssistance from "./pages/ReadingAssistance";
+import TestOnly from "./pages/test-only";
+
+
+// import srv from './fetch_';
 
 
 export default function App() {
@@ -51,6 +19,7 @@ export default function App() {
     <div className="App">
       <Router>
         <NavBar />
+        <RecentsContainer />
 
         <main>
           <Routes>
@@ -58,6 +27,9 @@ export default function App() {
             <Route path="/about" element={<About />} />
             <Route path="/login" element={<Navigation />} />
             <Route path="/assistance" element={<ReadingAssistance />} />
+            <Route path="/framework-testing" element={<AllInOneFramework />} />
+            <Route path="/testing_fetch" element={<TestOnly />} />
+
           </Routes>
         </main>
       </Router>

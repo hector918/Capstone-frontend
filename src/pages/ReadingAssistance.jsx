@@ -6,7 +6,20 @@ const ReadingAssistance = () => {
   const [result, setResult] = useState("");
   const [action, setAction] = useState(null);
   const [mouse, setMouse] = useState({ x: 0, y: 0 });
+  const [history, setHistory] = useState([]);
+  const [isHistoryExpanded, setHistoryExpanded] = useState(false);
+  const [historyVisible, setHistoryVisible] = useState(false);
   const con = useRef(null);
+
+  const clearHistory = () => {
+    if (history.length === 0) {
+      alert("History Already Cleared");
+    } else {
+      if (window.confirm("Delete History?")) {
+        setHistory([]);
+      }
+    }
+  };
 
   useEffect(() => {
     const showPopup = () => {
@@ -45,7 +58,23 @@ const ReadingAssistance = () => {
     const res = await axios.post(url, { q: selection });
     if (action === "image") setResult(res.data.image_url);
     else setResult(res.data.data);
+    addToHistory(selection, res.data.data, action); 
   };
+  
+
+  const addToHistory = (text, result, action) => {
+    setHistory([
+      ...history,
+      {
+        text,
+        result,
+        action,
+        timestamp: new Date(),
+      },
+    ]);
+  };
+
+
 
   useEffect(() => {
     if (!action) return;
@@ -62,9 +91,16 @@ const ReadingAssistance = () => {
     if (result === "") return null;
     if (result === "loading") return <p>Loading...</p>;
     if (action === "text") return <p>{result}</p>;
-    if (action === "image") return <img src={result} />;
+    if (action === "image") return <a href={result} target="_blank" rel="noopener noreferrer"><img src={result} /></a>;
     return <p>Error</p>;
   };
+  
+
+  const toggleHistory = () => {
+    setHistoryExpanded(!isHistoryExpanded);
+  };
+
+  
 
   return (
     <div className="p-5 mx-auto overflow-hidden" style={{ maxWidth: "800px", marginBottom: "300px" }}>
@@ -89,6 +125,36 @@ const ReadingAssistance = () => {
             <img src="/icons/image.png" />
           </span>
         </div>
+        <div className={isHistoryExpanded ? "history expanded" : "history collapsed"} onClick={toggleHistory}>
+        <h2>History {isHistoryExpanded && <img src="/icons/trash.png" onClick={clearHistory} style={{ cursor: 'pointer' }} />}</h2>
+        {isHistoryExpanded && (
+          <ul>
+           {history.map((item, index) => (
+  <li key={index} className="historyItem">
+    <div className="historyItemNumber">
+      {index + 1}
+    </div>
+    <p className="historyItemP textBlock">
+      Text: {item.text}
+      <span className="historyItemBorder" />
+    </p>
+    <p className="historyItemP">
+      Action: {item.action}
+      <span className="historyItemBorder" />
+    </p>
+    <div className="resultBlock">
+      <p className="historyItemResult">
+        Result: {item.action === "image" ? (<a href={item.result} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>Link</a>) : item.result}
+      </p>
+    </div>
+    <p className="historyItemTimestamp">
+      {item.timestamp.toLocaleString()}
+    </p>
+  </li>
+))}
+          </ul>
+        )}
+      </div>
         <div
           className="popup-detail"
           style={{ display: result ? "block" : "none" }}
@@ -96,6 +162,7 @@ const ReadingAssistance = () => {
           {renderResult()}
         </div>
       </div>
+      
       <div ref={con}>
         <p>
           My father’s family name being Pirrip, and my Christian name Philip, my
@@ -163,3 +230,6 @@ const ReadingAssistance = () => {
 };
 
 export default ReadingAssistance;
+
+
+

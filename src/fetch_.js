@@ -1,7 +1,7 @@
 const API = process.env.REACT_APP_API_URL;
-let default_fetch_options = { 
-  "Access-Control-Allow-Origin": "*" ,
-  "Content-Type": "application/x-www-form-urlencoded"
+let default_fetch_options = {
+  "Access-Control-Allow-Origin": "*",
+  "Content-Type": "application/x-www-form-urlencoded",
 };
 
 function error_handle(error) {
@@ -14,26 +14,22 @@ function error_handle(error) {
 //upload_file
 //
 
-<<<<<<< HEAD
-function question_to_reading_comprehension(q, fileHash, callback){
-=======
 /**The question_to_reading_comprehension function sends a POST request to the API server at the /rc endpoint with a question and a file hash as parameters in the body of the request. It then parses the response as JSON and calls a callback function with the question and data returned by the server. */
-function question_to_reading_comprehension(fileHash, q, callback){
->>>>>>> d90e556cf7e4bf93aa3985586f2b4d661a952dae
-  const body  = {
+function question_to_reading_comprehension(fileHash, q, callback) {
+  const body = {
     method: "POST",
-    body: new URLSearchParams({q, fileHash}),
+    body: new URLSearchParams({ q, fileHash }),
     headers: {
       ...default_fetch_options,
     },
-  }
+  };
   fetch(`${API}/rc`, body)
     .then((response) => response.json())
     .then((data) => {
       callback(data);
     })
     .catch(error_handle);
-    /* result example
+  /* result example
       {
         "id":"chatcmpl-7FtdtwCgRUMg6nEx64M0RPrNOpZJc","object":"chat.completion",
         "created":1684023165,
@@ -54,18 +50,18 @@ function question_to_reading_comprehension(fileHash, q, callback){
      */
 }
 
-function upload_file(files, callback){
+function upload_file(files, callback) {
   const formData = new FormData();
   for (let i = 0; i < files.files.length; i++) {
     formData.append("files", files.files[i]);
   }
-  const body  = {
+  const body = {
     method: "POST",
     body: formData,
-    headers : { 
-      "Access-Control-Allow-Origin": "*" 
-    }
-  }
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+    },
+  };
   fetch(`${API}/upload_files`, body)
     .then((response) => response.json())
     .then((data) => {
@@ -82,13 +78,13 @@ function upload_file(files, callback){
 }
 
 function read_text_to_image(q, callback) {
-  const body  = {
+  const body = {
     method: "POST",
-    body: new URLSearchParams({q}),
+    body: new URLSearchParams({ q }),
     headers: {
       ...default_fetch_options,
     },
-  }
+  };
   fetch(`${API}/ra/image`, body)
     .then((response) => response.json())
     .then((data) => {
@@ -103,15 +99,14 @@ function read_text_to_image(q, callback) {
    */
 }
 
-
 function read_text_to_explaination(q, callback) {
-  const body  = {
+  const body = {
     method: "POST",
-    body: new URLSearchParams({q}),
+    body: new URLSearchParams({ q }),
     headers: {
       ...default_fetch_options,
     },
-  }
+  };
   fetch(`${API}/ra/text`, body)
     .then((response) => response.json())
     .then((data) => {
@@ -127,5 +122,9 @@ function read_text_to_explaination(q, callback) {
   */
 }
 
-
-export default { read_text_to_image, read_text_to_explaination, upload_file, question_to_reading_comprehension };
+export default {
+  read_text_to_image,
+  read_text_to_explaination,
+  upload_file,
+  question_to_reading_comprehension,
+};

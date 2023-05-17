@@ -192,6 +192,7 @@ const textToComprehension = (fileHash, question, callback)=>{
     callback(data.choices[0].message.content);
   })
   
+  
 }
 export default {
   getAllFiles, getFileDetail, deleteFile,

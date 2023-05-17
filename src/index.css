@@ -224,12 +224,17 @@ code {
 
 .historyItemResult {
   color: #696969;
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-all;
 }
+
 
 .historyItemTimestamp {
   font-size: 0.8em;
   position: absolute;
-  bottom: -17px;
+  bottom: 5px;
   left: 10px;
   color: #A9A9A9;
 }
@@ -245,5 +250,23 @@ code {
   border-radius: 5px;
 }
 
+.bigcontainer {
+  position: relative;
+  /* other styles */
+}
 
+.history {
+  position:relative;
+  top: -100px; /* adjust this value based on the height of your navbar */
+  right: -320px;
+  /* other styles */
+}
 
+.historyItemResult img {
+  max-width: 100%;
+  max-height: 100px;
+}
+
+ 
+
+ 

@@ -1,22 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import storage from '../storage_';
+import lc from "../storage_";
 
 const ReadingAssistance = () => {
   const [text, setText] = useState('');
 
   useEffect(() => {
-    const fetchData = async () => {
-      const fileData = storage.getFileDetail(storage.fileHash, ['metaData']);
-      if (!fileData) {
-        // File not found, redirect to homepage or handle the error
-        return;
-      }
-      // Fetch the text from metadata
-      const { text } = fileData.metaData;
-      setText(text);
+    const fetchPdfText = async () => {
+      const fileHash = '0ad1d820761a5aca9df52c22ea1cfc4ca5dad64923f51270dbe8f106f3817eef';
+      lc.download_file(fileHash, (result) => {
+        if (result && result.text) {
+          setText(result.text);
+        }
+      });
     };
 
-    fetchData();
+    fetchPdfText();
   }, []);
 
   return (

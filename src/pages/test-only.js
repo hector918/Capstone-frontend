@@ -1,5 +1,5 @@
 import React from "react";
-import lc from '../storage_';
+import { storageFunctions } from "../storage_";
 
 export default function TestOnly(){
   function onFileUpload(evt){
@@ -13,7 +13,8 @@ export default function TestOnly(){
   function onReadingComprehensionSubmit(evt){
     evt.preventDefault();
     const fileHash = '0ad1d820761a5aca9df52c22ea1cfc4ca5dad64923f51270dbe8f106f3817eef';
-    lc.textToComprehension(fileHash, evt.target.readingcomprehenstion.value, (data)=>{
+    //level are presented as "1","2","3","4","5" by default level = "2"
+    lc.textToComprehension(fileHash, evt.target.readingcomprehenstion.value, '2', (data)=>{
       console.log(data);
     })
   }
@@ -44,6 +45,25 @@ export default function TestOnly(){
   function printTextToImage(evt){
     const fileHash = '0ad1d820761a5aca9df52c22ea1cfc4ca5dad64923f51270dbe8f106f3817eef';
     console.log(lc.getFileDetail(fileHash, ['textToImage']));
+  }
+
+  ////////////////////////////////////////////
+  function downloadFileClick(evt){
+    evt.preventDefault();
+    const fileHash = '0ad1d820761a5aca9df52c22ea1cfc4ca5dad64923f51270dbe8f106f3817eef';
+    lc.downloadFile(fileHash, (result)=>{
+      if(result){
+        console.log(result);
+      }
+    })
+  }
+  ////////////////////////////////////////////
+  function getFileMetaClick(evt){
+    evt.preventDefault();
+    const fileHash = '0ad1d820761a5aca9df52c22ea1cfc4ca5dad64923f51270dbe8f106f3817eef';
+    lc.getFileMeta(fileHash, (meta) => {
+      console.log(meta);
+    })
   }
   ////////////////////////////////////////////
   function getFileDetailClick(evt){
@@ -103,6 +123,19 @@ export default function TestOnly(){
       </form>
       <button onClick={printTextToImage}>print text to image history to console</button>
     </div>
+    <div>
+      <h3> Download file by hash</h3>
+      <form onSubmit={downloadFileClick}>
+        <button>download</button>
+      </form>
+    </div>
+    <div>
+      <h3> read file meta by hash</h3>
+      <form onSubmit={getFileMetaClick}>
+        <button>get meta data</button>
+      </form>
+    </div>
+    
     <div>
       <button onClick={getFileDetailClick}>get all detail from file Hash</button>
       <button onClick={getAllfiles}>get all files</button>

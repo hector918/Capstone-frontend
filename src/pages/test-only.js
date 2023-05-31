@@ -1,12 +1,12 @@
 import React from "react";
-import { storageFunctions } from "../storage_";
+import storageFunctions from "../storage_";
 
 export default function TestOnly(){
   function onFileUpload(evt){
     evt.preventDefault();
-    lc.uploadFile(evt.target.files, (data)=>{
+    storageFunctions.uploadFile(evt.target.files, (data)=>{
       console.log(data);
-      console.log(lc.getAllFiles());
+      console.log(storageFunctions.getAllFiles());
     })
   }
   //below are examples of all api call/////////////////
@@ -14,44 +14,44 @@ export default function TestOnly(){
     evt.preventDefault();
     const fileHash = '0ad1d820761a5aca9df52c22ea1cfc4ca5dad64923f51270dbe8f106f3817eef';
     //level are presented as "1","2","3","4","5" by default level = "2"
-    lc.textToComprehension(fileHash, evt.target.readingcomprehenstion.value, '2', (data)=>{
+    storageFunctions.textToComprehension(fileHash, evt.target.readingcomprehenstion.value, '2', (data)=>{
       console.log(data);
     })
   }
   function printComprehenstionHistory(evt){
     const fileHash = '0ad1d820761a5aca9df52c22ea1cfc4ca5dad64923f51270dbe8f106f3817eef';
-    console.log(lc.getFileDetail(fileHash, ['textToComprehenstion']));
+    console.log(storageFunctions.getFileDetail(fileHash, ['textToComprehenstion']));
   }
   ////////////////////////////////////////////
   function onTextToExplanation (evt){
     evt.preventDefault();
     const fileHash = '0ad1d820761a5aca9df52c22ea1cfc4ca5dad64923f51270dbe8f106f3817eef';
-    lc.textToExplanation(fileHash, evt.target.texttoexplanation.value, (data)=>{
+    storageFunctions.textToExplanation(fileHash, evt.target.texttoexplanation.value, (data)=>{
       console.log(data);
     })
   }
   function printTextToExplanation(evt){
     const fileHash = '0ad1d820761a5aca9df52c22ea1cfc4ca5dad64923f51270dbe8f106f3817eef';
-    console.log(lc.getFileDetail(fileHash, ['textToExplanation']));
+    console.log(storageFunctions.getFileDetail(fileHash, ['textToExplanation']));
   }
   ////////////////////////////////////////////
   function OnTextToImage(evt){
     evt.preventDefault();
     const fileHash = '0ad1d820761a5aca9df52c22ea1cfc4ca5dad64923f51270dbe8f106f3817eef';
-    lc.textToImage(fileHash, evt.target.texttoimage.value, (data)=>{
+    storageFunctions.textToImage(fileHash, evt.target.texttoimage.value, (data)=>{
       console.log(data);
     })
   }
   function printTextToImage(evt){
     const fileHash = '0ad1d820761a5aca9df52c22ea1cfc4ca5dad64923f51270dbe8f106f3817eef';
-    console.log(lc.getFileDetail(fileHash, ['textToImage']));
+    console.log(storageFunctions.getFileDetail(fileHash, ['textToImage']));
   }
 
   ////////////////////////////////////////////
   function downloadFileClick(evt){
     evt.preventDefault();
     const fileHash = '0ad1d820761a5aca9df52c22ea1cfc4ca5dad64923f51270dbe8f106f3817eef';
-    lc.downloadFile(fileHash, (result)=>{
+    storageFunctions.downloadFile(fileHash, (result)=>{
       if(result){
         console.log(result);
       }
@@ -61,14 +61,14 @@ export default function TestOnly(){
   function getFileMetaClick(evt){
     evt.preventDefault();
     const fileHash = '0ad1d820761a5aca9df52c22ea1cfc4ca5dad64923f51270dbe8f106f3817eef';
-    lc.getFileMeta(fileHash, (meta) => {
+    storageFunctions.getFileMeta(fileHash, (meta) => {
       console.log(meta);
     })
   }
   ////////////////////////////////////////////
   function getFileDetailClick(evt){
     const fileHash = '0ad1d820761a5aca9df52c22ea1cfc4ca5dad64923f51270dbe8f106f3817eef';
-    console.log(lc.getFileDetail(fileHash, 
+    console.log(storageFunctions.getFileDetail(fileHash, 
       [
         'metaData',
         'textToImage',
@@ -77,8 +77,8 @@ export default function TestOnly(){
       ]));
   }
   function getAllfiles(evt){
-    let allFiles = lc.getAllFiles();
-    allFiles = allFiles.map(el => lc.getFileDetail(el, ['metaData','textToImage']));
+    let allFiles = storageFunctions.getAllFiles();
+    allFiles = allFiles.map(el => storageFunctions.getFileDetail(el, ['metaData','textToImage']));
     console.log(allFiles);
   }
   ////////////////////////////////////////////

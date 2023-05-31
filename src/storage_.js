@@ -1,57 +1,54 @@
-import srv from './fetch_';
-import { getDocument } from 'pdfjs-dist/build/pdf';
+import srv from './fetch_'
+import { pdfjs } from 'react-pdf';
+
+const API = process.env.REACT_APP_API_URL;
+
 const [ fileTable, file_list_prefix ] = [ "files", "filehash" ];
 function error_handle(error) {
   console.log(error);
 }
-
-function errorHandle(error) {
-  console.log(error);
-}
-
-function checkString(...args) {
-  for (let item of args) {
-    if (typeof item !== 'string') {
-      errorHandle(item, ' not string');
-      return false;
-    }
+function check_string(){
+  for(let item of arguments) if(typeof item !== 'string'){
+    error_handle(item, ' not string');
+    return false;
   }
   return true;
 }
-
+//////////////////////////////////////////////////
 function downloadFile(fileHash, callback){
   srv.download_file(fileHash, (result) => {
     callback(result);
   })
 }
-
-async function uploadFile(files, callback) {
-  srv.upload_file(files, (data) => {
+function uploadFile(files, callback){
+  srv.upload_file(files, (data)=>{
     try {
-      if (data.result === "success" && data.fileHash.length === 64) {
-        let filesTable = localStorage.getItem('files');
+      if(data.fileHash.length === 64) {
+        let files_table = localStorage.getItem(fileTable);
         try {
-          filesTable = JSON.parse(filesTable);
-          filesTable.push(data.fileHash);
-          localStorage.setItem('files', JSON.stringify(filesTable));
+          files_table = JSON.parse(files_table);
+          if(!files_table.includes(data.fileHash)){
+            files_table.push(data.fileHash);
+          }
+          localStorage.setItem(fileTable, JSON.stringify(files_table));
         } catch (error) {
-          localStorage.setItem('files', JSON.stringify([data.fileHash]));
+          console.log(error);
+          localStorage.setItem(fileTable, JSON.stringify([data.fileHash]));
         }
-        localStorage.setItem(
-          `filehash-${data.fileHash}`,
-          JSON.stringify(files.files[0])
-        );
+        localStorage.setItem(`${file_list_prefix}-${data.fileHash}`, fileObjToString(files.files[0]));
         callback(data);
-      } else {
-        throw new Error('Upload failed');
-      }
+      }else throw new Error("upload failed");
     } catch (error) {
-      errorHandle(error);
+      error_handle(error);
       callback(false);
     }
-  });
+  })
+  function fileObjToString(fileObj){
+    const ret = {};
+    for(let x in fileObj){ ret[x] = fileObj[x] }
+    return JSON.stringify(ret);
+  }
 }
-
 function getFileMeta(fileHash, callback){
   srv.read_file_metadata(fileHash, (meta) => {
     //plug the meta data by to localstorage
@@ -64,9 +61,9 @@ function getFileMeta(fileHash, callback){
           files_table.push(fileHash);
         }
         const file_key_name = `${file_list_prefix}-${fileHash}`;
-        if(!localStorage.getItem(__dirname)){
+        if(!localStorage.getItem(file_key_name)){
           //if file record not exist
-          localStorage.setItem(__dirname, JSON.stringify(meta));
+          localStorage.setItem(file_key_name, JSON.stringify(meta));
         }
         callback(meta);
       }
@@ -78,73 +75,90 @@ function getFileMeta(fileHash, callback){
     }
   })
 }
-
-function getAllFiles(limit = undefined) {
-  let filesTable = localStorage.getItem('files');
+function getAllFiles(limit = undefined){
+  let files_table = localStorage.getItem(fileTable);
   try {
-    if (!filesTable) {
+    if(!files_table){
       return [];
-    } else {
-      let ret = JSON.parse(filesTable);
+    }else{
+      let ret = JSON.parse(files_table);
       return limit ? ret.slice(0, limit) : ret;
     }
   } catch (error) {
-    errorHandle(error);
+    error_handle(error);
     return [];
   }
 }
 
-function getFileDetail(fileHash, historyCategory = ['metaData']) {
+function getFileDetail(fileHash, history_category = ['metaData']){
   const ret = {};
-  if (checkString(fileHash) === false) return false;
-  for (let x of historyCategory) {
+  if (check_string(fileHash) === false ) return false;
+  for(let x of history_category){
     try {
-      switch (x) {
-        case 'metaData':
-          ret[x] = JSON.parse(localStorage.getItem(`filehash-${fileHash}`));
-          break;
-        case 'comprehension':
-        case 'image':
-        case 'text':
+      switch(x){
+        case "metaData":
+          ret[x] = JSON.parse(localStorage.getItem(`${file_list_prefix}-${fileHash}`));
+        break;
+        case "comprehension": case "image": case "text":
           ret[x] = getHistory(x, fileHash);
-          break;
-        case 'textToExplanation':
+        break;
+        case "textToExplanation":
           ret['textToExplanation'] = getHistory('text', fileHash);
-          break;
-        case 'textToImage':
+        break;
+        case "textToImage":
           ret['textToImage'] = getHistory('image', fileHash);
-          break;
-        case 'textToComprehension':
-          ret['textToComprehension'] = getHistory('comprehension', fileHash);
-          break;
+        break;
+        case "textToComprehenstion":
+          ret['textToComprehenstion'] = getHistory('comprehension', fileHash);
+        break;
+        default:
+          error_handle('not recognize in get file detail:' + x);
       }
     } catch (error) {
-      errorHandle(error);
+      error_handle(error);
       continue;
     }
   }
   return ret;
 }
 
+function deleteFile(fileHash){
+  localStorage.removeItem(`${file_list_prefix}-${fileHash}`);
+  deleteHistory('image', fileHash);
+  deleteHistory('text', fileHash);
+  deleteHistory('comprehension', fileHash);
+}
+
 async function getFileContent(fileHash) {
   try {
-    const fileContent = await srv.getFileContent(fileHash);
-    return fileContent;
+    const response = await fetch(`${API}/download/${fileHash}`);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    const blob = await response.blob();
+    return blob;
   } catch (error) {
-    console.error(error);
+    console.error('Error getting file content:', error);
     return null;
   }
 }
 
 
 
-function deleteFile(fileHash) {
-  localStorage.removeItem(`filehash-${fileHash}`);
-  deleteHistory('image', fileHash);
-  deleteHistory('text', fileHash);
-  deleteHistory('comprehension', fileHash);
-}
 
+
+
+
+// function checkFile(fileHash){
+//   try {
+//     const files = getAllFiles();
+//     return files.includes(fileHash);
+//   } catch (error) {
+//     error_handle(error);
+//     return false;
+//   }
+// }
+////all history///////////////////////
 function check_key_name(category, fileHash){
   let keyName = ""
   switch(category){
@@ -162,50 +176,98 @@ function check_key_name(category, fileHash){
   }
   return keyName;
 }
-
-function setHistory(category, fileHash, q, data) {
-  const keyName = __dirname(category, fileHash);
-  if (!keyName) return false;
+function setHistory(category, fileHash, q, data){
+  const keyName = check_key_name(category, fileHash);
+  if(!keyName) return false;
   try {
-    let history = JSON.parse(localStorage.getItem(keyName)) || {};
-    history[q] = { q, data, timestamp: new Date() };
+    let history = JSON.parse(localStorage.getItem(keyName));
+    history[q] = {q, data, timestamp: new Date()}
     localStorage.setItem(keyName, JSON.stringify(history));
   } catch (error) {
-    localStorage.setItem(
-      keyName,
-      JSON.stringify({ [q]: { q, data, timestamp: new Date() } })
-    );
+    localStorage.setItem(keyName, JSON.stringify({[q]: {q, data, timestamp: new Date()}}));
   }
 }
-
-function getHistory(category, fileHash) {
-  if (typeof fileHash !== 'string') return false;
-  const keyName = __dirname(category, fileHash);
+function getHistory(category, fileHash){
+  if(typeof fileHash !== 'string') return false;
+  const keyName = check_key_name(category, fileHash);
   try {
-    const history = JSON.parse(localStorage.getItem(keyName)) || {};
-    return history;
+    const history = JSON.parse(localStorage.getItem(keyName))
+    return !history ? {} : history;
   } catch (error) {
-    errorHandle(error);
+    error_handle(error);
     return {};
   }
 }
+function deleteHistory(category, fileHash){
+  const keyName = check_key_name(category, fileHash);
+  localStorage.removeItem(keyName);
+}
+///wrapped backend api//////////////
+function pull_history(fileHash, category, question){
+  const history = getFileDetail(fileHash, [category]);
+  try{
+    if(history[category][question]){
+      return history[category][question].data;
+    }
+    return false;
+  }catch(error){
+    return false;
+  }
+}
+const textToImage = (fileHash, question, callback)=>{
+  if (check_string(fileHash, question) === false ) return false;
+  const history = getFileDetail(fileHash, ['image']);
+  try{
+    if(history['image'][question]){
+      callback(history['image'][question].data);
+      return;
+    } 
+  }catch(error){
+    error_handle(`${fileHash} text to explanation history not found`);
+  }
+  srv.read_text_to_image(question, (data)=>{
+    setHistory("image", fileHash, question, data.image_url);
+    callback(data.image_url);
+  })
+}
 
- function deleteHistory(category, fileHash) {
-   const keyName = (category, fileHash);
-   localStorage.removeItem(keyName);
- }
+const textToExplanation = (fileHash, question, callback)=>{
+  if (check_string(fileHash, question) === false ) return false;
+  const history = getFileDetail(fileHash, ['text']);
+  try{
+    if(history['text'][question]){
+      callback(history['text'][question].data);
+      return;
+    } 
+  }catch(error){
+    error_handle(`${fileHash} text to explanation history not found`);
+  }
+  srv.read_text_to_explaination(question, (data)=>{
+    setHistory("text", fileHash, question, data.data);
+    callback(data.data);
+  })
+}
 
-export const storageFunctions = {
-  setHistory,
-  getFileContent,
-  uploadFile,
-  getAllFiles,
-  getFileDetail,
-  deleteFile,
-  deleteHistory,
-  downloadFile,
-  getFileMeta,
-  check_key_name,
-};
+const textToComprehension = (fileHash, question, level = '2', callback) => {
+  if (check_string(fileHash, question) === false ) return false;
+  const history = pull_history(fileHash, 'comprehension', `${question}-${level}`);
+  if(history !== false){
+    callback(history);
+    return;
+  } 
+  //////////////////////////////
+  srv.question_to_reading_comprehension(fileHash, question, level = '2', (data) => {
+    setHistory("comprehension", fileHash, `${question}-${level}`, data.choices[0].message.content);
+    callback(data.choices[0].message.content);
+  })
+}
+const storageFunctions = {
+  getAllFiles, getFileDetail, deleteFile,
+  uploadFile, downloadFile, getFileMeta,
+  textToComprehension,
+  textToExplanation,
+  textToImage, getFileContent
+}
+export default storageFunctions;
 
-export { getDocument };
+

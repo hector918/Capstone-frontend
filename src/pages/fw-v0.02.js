@@ -1,9 +1,19 @@
 import React, { useEffect } from "react";
+<<<<<<< HEAD
 import "./fw-v0.02.css";
 import LandingPage from "./fw-v0.02-sub/landing-page";
 import AssistancePage from "./fw-v0.02-sub/reading-assistance-page-h";
 let frames = undefined;
 export default function FW002() {
+=======
+import './fw-v0.02.css';
+import LandingPage from "../components/Landing-page";
+import AssistancePage from "./fw-v0.02-sub/reading-assistance-page";
+
+
+let frames = undefined;
+export default function Welcome(){
+>>>>>>> main
   const fileHash =
     "0ad1d820761a5aca9df52c22ea1cfc4ca5dad64923f51270dbe8f106f3817eef";
   useEffect(() => {
